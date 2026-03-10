@@ -6,10 +6,8 @@ const globalForPrisma = globalThis as unknown as {
 };
 
 function createPrismaClient() {
-  // Dynamic import to avoid edge runtime issues
-  const path = require('path');
-  const databasePath = path.join(process.cwd(), 'dev.db');
-  const adapter = new PrismaBetterSqlite3({ url: `file:${databasePath}` });
+  const url = process.env.DATABASE_URL ?? `file:${require('path').join(process.cwd(), 'dev.db')}`;
+  const adapter = new PrismaBetterSqlite3({ url });
   return new PrismaClient({ adapter });
 }
 
