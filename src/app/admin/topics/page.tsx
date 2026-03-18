@@ -1,7 +1,7 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
 
@@ -21,9 +21,14 @@ interface Topic {
 export default function TopicsManagement() {
   const { status } = useSession();
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+  const categoryIdParam = searchParams.get('categoryId') ?? '';
+  const fromCategories = searchParams.get('from') === 'categories';
+  const backHref = fromCategories ? '/admin/categories' : '/admin';
   const [topics, setTopics] = useState<Topic[]>([]);
   const [categories, setCategories] = useState<Category[]>([]);
-  const [selectedCategory, setSelectedCategory] = useState<string>('');
+  const [selectedCategory, setSelectedCategory] = useState<string>(categoryIdParam);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
@@ -39,6 +44,12 @@ export default function TopicsManagement() {
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [status, selectedCategory]);
+
+  useEffect(() => {
+    setSelectedCategory((currentCategory) => {
+      return currentCategory === categoryIdParam ? currentCategory : categoryIdParam;
+    });
+  }, [categoryIdParam]);
 
   const fetchData = async () => {
     try {
@@ -84,6 +95,21 @@ export default function TopicsManagement() {
     }
   };
 
+  const handleCategoryChange = (categoryId: string) => {
+    setSelectedCategory(categoryId);
+
+    const params = new URLSearchParams(searchParams.toString());
+
+    if (categoryId) {
+      params.set('categoryId', categoryId);
+    } else {
+      params.delete('categoryId');
+    }
+
+    const query = params.toString();
+    router.replace(query ? `${pathname}?${query}` : pathname);
+  };
+
   const getConfidenceBadgeColor = (confidence: string) => {
     switch (confidence) {
       case 'expert':
@@ -121,7 +147,7 @@ export default function TopicsManagement() {
             </div>
             <div className="flex gap-3">
               <Link
-                href="/admin"
+                href={backHref}
                 className="px-4 py-2 border border-[var(--border)] text-[var(--ink)] hover:opacity-80 transition cursor-pointer"
               >
                 ← Back
@@ -143,7 +169,7 @@ export default function TopicsManagement() {
             <select
               id="category-filter"
               value={selectedCategory}
-              onChange={(e) => setSelectedCategory(e.target.value)}
+              onChange={(e) => handleCategoryChange(e.target.value)}
               className="px-4 py-2 border border-[var(--border)] bg-[var(--background)] text-[var(--ink)] cursor-pointer"
             >
               <option value="">All Categories</option>
