@@ -128,7 +128,7 @@ export default function QuizQuestionsPage() {
                 {/* Topic Header */}
                 <button
                   onClick={() => toggleTopic(topic.id)}
-                  className="w-full px-6 py-4 hover:bg-[var(--code-bg)] transition text-left flex items-center justify-between"
+                  className="w-full px-6 py-4 hover:bg-[var(--code-bg)] transition text-left flex items-center justify-between cursor-pointer"
                 >
                   <div>
                     <h2 className="text-lg font-semibold text-[var(--ink)]">

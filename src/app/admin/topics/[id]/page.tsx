@@ -20,9 +20,6 @@ export default function EditTopic() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
-  const [keyPointsCount, setKeyPointsCount] = useState(0);
-  const [codeExamplesCount, setCodeExamplesCount] = useState(0);
-  const [quizQuestionsCount, setQuizQuestionsCount] = useState(0);
   const [formData, setFormData] = useState({
     id: '',
     title: '',
@@ -68,9 +65,6 @@ export default function EditTopic() {
         categoryId: topicData.categoryId,
         confidence: topicData.confidence,
       });
-      setKeyPointsCount(topicData.keyPoints?.length || 0);
-      setCodeExamplesCount(topicData.codeExamples?.length || 0);
-      setQuizQuestionsCount(topicData.quizQuestions?.length || 0);
     } catch (err) {
       setError('Failed to load data');
       console.error(err);
@@ -236,54 +230,6 @@ export default function EditTopic() {
                 <option value="advanced">Advanced</option>
                 <option value="expert">Expert</option>
               </select>
-            </div>
-          </div>
-
-          {/* Key Points */}
-          <div className="bg-[var(--paper)] border border-[var(--border)] p-6">
-            <div className="flex justify-between items-center">
-              <div>
-                <h2 className="text-xl font-bold text-[var(--ink)] mb-2">Key Points</h2>
-                <p className="text-[var(--ink-light)] text-sm">{keyPointsCount} key point{keyPointsCount !== 1 ? 's' : ''}</p>
-              </div>
-              <Link
-                href={`/admin/topics/${id}/key-points`}
-                className="px-4 py-2 bg-[var(--ink)] text-[var(--background)] hover:opacity-80 transition"
-              >
-                Edit Key Points →
-              </Link>
-            </div>
-          </div>
-
-          {/* Code Examples */}
-          <div className="bg-[var(--paper)] border border-[var(--border)] p-6">
-            <div className="flex justify-between items-center">
-              <div>
-                <h2 className="text-xl font-bold text-[var(--ink)] mb-2">Code Examples</h2>
-                <p className="text-[var(--ink-light)] text-sm">{codeExamplesCount} code example{codeExamplesCount !== 1 ? 's' : ''}</p>
-              </div>
-              <Link
-                href={`/admin/topics/${id}/code-examples`}
-                className="px-4 py-2 bg-[var(--ink)] text-[var(--background)] hover:opacity-80 transition"
-              >
-                Edit Code Examples →
-              </Link>
-            </div>
-          </div>
-
-          {/* Quiz Questions */}
-          <div className="bg-[var(--paper)] border border-[var(--border)] p-6">
-            <div className="flex justify-between items-center">
-              <div>
-                <h2 className="text-xl font-bold text-[var(--ink)] mb-2">Quiz Questions</h2>
-                <p className="text-[var(--ink-light)] text-sm">{quizQuestionsCount} question{quizQuestionsCount !== 1 ? 's' : ''}</p>
-              </div>
-              <Link
-                href={`/admin/topics/${id}/quiz-questions`}
-                className="px-4 py-2 bg-[var(--ink)] text-[var(--background)] hover:opacity-80 transition"
-              >
-                Edit Questions →
-              </Link>
             </div>
           </div>
 

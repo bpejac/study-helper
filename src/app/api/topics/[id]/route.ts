@@ -53,17 +53,9 @@ export async function PUT(
       categoryId,
       confidence,
       lastReviewed,
-      keyPoints,
-      codeExamples,
-      quizQuestions,
     } = body;
 
-    // Delete existing relations
-    await prisma.keyPoint.deleteMany({ where: { topicId: id } });
-    await prisma.codeExample.deleteMany({ where: { topicId: id } });
-    await prisma.quizQuestion.deleteMany({ where: { topicId: id } });
-
-    // Update topic with new relations
+    // Update topic fields only - relations are handled by their own endpoints
     const topic = await prisma.topic.update({
       where: { id },
       data: {
@@ -73,29 +65,6 @@ export async function PUT(
         categoryId,
         confidence,
         lastReviewed,
-        keyPoints: {
-          create: keyPoints?.map((kp: any, index: number) => ({
-            title: kp.title,
-            description: kp.description,
-            order: index,
-          })) || [],
-        },
-        codeExamples: {
-          create: codeExamples?.map((ce: any, index: number) => ({
-            title: ce.title,
-            language: ce.language,
-            code: ce.code,
-            explanation: ce.explanation,
-            order: index,
-          })) || [],
-        },
-        quizQuestions: {
-          create: quizQuestions?.map((qq: any, index: number) => ({
-            question: qq.question,
-            answer: qq.answer,
-            order: index,
-          })) || [],
-        },
       },
       include: {
         keyPoints: { orderBy: { order: 'asc' } },

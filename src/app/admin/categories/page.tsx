@@ -4,6 +4,7 @@ import { useSession } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { Card } from '@/components';
 
 interface Category {
   id: string;
@@ -114,9 +115,9 @@ export default function CategoriesManagement() {
         {/* Categories List */}
         <div className="grid grid-cols-1 gap-4">
           {categories.map((category) => (
-            <div
+            <Card
               key={category.id}
-              className="border border-[var(--border)] p-6 hover:bg-[var(--paper)] transition"
+              className="p-6"
             >
               <div className="flex items-start justify-between">
                 <div className="flex items-start gap-4 flex-1">
@@ -159,7 +160,7 @@ export default function CategoriesManagement() {
                   </button>
                 </div>
               </div>
-            </div>
+            </Card>
           ))}
 
           {categories.length === 0 && !loading && (

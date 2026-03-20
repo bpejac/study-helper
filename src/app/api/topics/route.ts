@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { auth } from '@/lib/auth';
-import { getAllTopics, searchTopics } from '@/lib/data';
+import { getAllTopics, searchTopics, getTopicsByCategory } from '@/lib/data';
 import { prisma } from '@/lib/prisma';
 import type { KeyPoint, CodeExample, QuizQuestion, Topic } from '@/types';
 
@@ -18,11 +18,7 @@ export async function GET(request: NextRequest) {
         topics = topics.filter((t: Topic) => t.category === categoryId);
       }
     } else if (categoryId) {
-      topics = await prisma.topic.findMany({
-        where: { categoryId },
-        include: { category: true },
-        orderBy: { title: 'asc' },
-      });
+      topics = await getTopicsByCategory(categoryId);
     } else {
       topics = await getAllTopics();
     }

@@ -80,7 +80,7 @@ export default function EditKeyPoints() {
     setError('');
 
     try {
-      const response = await fetch(`/api/topics/${id}`, {
+      const response = await fetch(`/api/topics/${id}/key-points`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -93,7 +93,7 @@ export default function EditKeyPoints() {
         throw new Error(data.error || 'Failed to update key points');
       }
 
-      router.push(`/admin/topics/${id}`);
+      router.push("/admin/topics");
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to update key points');
     } finally {
@@ -166,7 +166,7 @@ export default function EditKeyPoints() {
                 {saving ? 'Saving...' : 'Save'}
               </button>
               <button
-                onClick={() => handleNavigation(`/admin/topics/${id}`)}
+                onClick={() => handleNavigation("/admin/topics")}
                 className="px-4 py-2 border border-[var(--border)] text-[var(--ink)] hover:opacity-80 transition cursor-pointer"
               >
                 ← Back
@@ -247,7 +247,7 @@ export default function EditKeyPoints() {
               </button>
               <button
                 type="button"
-                onClick={() => handleNavigation(`/admin/topics/${id}`)}
+                onClick={() => handleNavigation("/admin/topics")}
                 className="px-6 py-3 border border-[var(--border)] text-[var(--ink)] hover:opacity-80 transition cursor-pointer"
               >
                 Cancel

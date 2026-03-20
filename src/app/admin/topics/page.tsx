@@ -4,6 +4,7 @@ import { useSession } from 'next-auth/react';
 import { usePathname, useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import { Card } from '@/components';
 
 interface Category {
   id: string;
@@ -191,9 +192,9 @@ export default function TopicsManagement() {
         {/* Topics List */}
         <div className="grid grid-cols-1 gap-4">
           {topics.map((topic) => (
-            <div
+            <Card
               key={topic.id}
-              className="bg-[var(--paper)] border border-[var(--border)] p-6 hover:border-[var(--ink)] transition"
+              className="p-6"
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
@@ -214,22 +215,40 @@ export default function TopicsManagement() {
                     ID: {topic.id}
                   </p>
                 </div>
-                <div className="flex gap-2 ml-4">
+                <div className="flex flex-wrap gap-2 ml-4">
+                  <Link
+                    href={`/admin/topics/${topic.id}/key-points`}
+                    className="px-3 py-2 border border-[var(--border)] text-[var(--ink)] hover:opacity-80 transition cursor-pointer text-sm"
+                  >
+                    Key Points
+                  </Link>
+                  <Link
+                    href={`/admin/topics/${topic.id}/code-examples`}
+                    className="px-3 py-2 border border-[var(--border)] text-[var(--ink)] hover:opacity-80 transition cursor-pointer text-sm"
+                  >
+                    Code
+                  </Link>
+                  <Link
+                    href={`/admin/topics/${topic.id}/quiz-questions`}
+                    className="px-3 py-2 border border-[var(--border)] text-[var(--ink)] hover:opacity-80 transition cursor-pointer text-sm"
+                  >
+                    Quiz
+                  </Link>
                   <Link
                     href={`/admin/topics/${topic.id}`}
-                    className="px-4 py-2 bg-[var(--ink)] text-[var(--background)] hover:opacity-80 transition cursor-pointer"
+                    className="px-3 py-2 bg-[var(--ink)] text-[var(--background)] hover:opacity-80 transition cursor-pointer text-sm"
                   >
                     Edit
                   </Link>
                   <button
                     onClick={() => handleDelete(topic.id)}
-                    className="px-4 py-2 border border-[var(--border)] text-[var(--ink)] hover:opacity-80 transition cursor-pointer"
+                    className="px-3 py-2 border border-[var(--border)] text-[var(--ink)] hover:opacity-80 transition cursor-pointer text-sm"
                   >
                     Delete
                   </button>
                 </div>
               </div>
-            </div>
+            </Card>
           ))}
 
           {topics.length === 0 && !loading && (

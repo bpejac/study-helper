@@ -13,6 +13,7 @@
     "@prisma/client": "^7.4.0",
     "bcryptjs": "^3.0.3",
     "better-sqlite3": "^12.6.2",
+    "classnames": "^2.5.1",
     "next": "16.1.6",
     "next-auth": "^5.0.0-beta.30",
     "prism-react-renderer": "^2.4.1",

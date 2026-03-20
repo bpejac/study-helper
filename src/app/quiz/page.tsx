@@ -268,7 +268,7 @@ export default function QuizPage() {
           ) : (
             <button
               onClick={() => setShowAnswer(true)}
-              className="w-full py-3 bg-[var(--code-bg)] hover:opacity-80 border border-[var(--border)] text-[var(--ink)] text-sm transition-colors"
+              className="w-full py-3 bg-[var(--code-bg)] hover:opacity-80 border border-[var(--border)] text-[var(--ink)] text-sm transition-colors cursor-pointer"
             >
               Reveal Answer
             </button>
@@ -280,13 +280,13 @@ export default function QuizPage() {
           <div className="flex gap-3">
             <button
               onClick={() => handleAnswer(false)}
-              className="flex-1 py-3 bg-[var(--paper)] hover:bg-[var(--code-bg)] border border-[var(--border)] text-[var(--ink-light)] text-sm transition-colors"
+              className="flex-1 py-3 bg-[var(--paper)] hover:bg-[var(--code-bg)] border border-[var(--border)] text-[var(--ink-light)] text-sm transition-colors cursor-pointer"
             >
               Didn&apos;t Know
             </button>
             <button
               onClick={() => handleAnswer(true)}
-              className="flex-1 py-3 bg-[var(--ink)] hover:opacity-80 text-[var(--background)] text-sm transition-colors"
+              className="flex-1 py-3 bg-[var(--ink)] hover:opacity-80 text-[var(--background)] text-sm transition-colors cursor-pointer"
             >
               Got It
             </button>
