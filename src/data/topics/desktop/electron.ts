@@ -229,5 +229,4 @@ app.whenReady().then(() => {
       explanation: 'Electron provides direct access to native OS features that web apps cannot reach. These APIs make desktop apps feel native rather than like wrapped websites.',
     },
   ],
-  resources: ['Electron Documentation', 'Electron Fiddle'],
 };

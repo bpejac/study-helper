@@ -1,19 +1,30 @@
 import Link from 'next/link';
 import { CategoryCard, TopicCard } from '@/components';
-import { categories, topics, getTopicsByCategory } from '@/data/knowledge';
+import { getAllCategories, getAllTopics } from '@/lib/data';
 
-export default function Home() {
+export const dynamic = 'force-dynamic';
+
+export default async function Home() {
+  const categories = await getAllCategories();
+  const topics = await getAllTopics();
+  
+  // Get topic counts by category
+  const topicCountsByCategory = topics.reduce((acc, topic) => {
+    acc[topic.category] = (acc[topic.category] || 0) + 1;
+    return acc;
+  }, {} as Record<string, number>);
+  
   // Get a few recent/featured topics
   const featuredTopics = topics.slice(0, 4);
 
   return (
-    <div className="min-h-screen">
+    <div>
       {/* Hero Section */}
       <section className="py-16 sm:py-24 border-b border-[var(--border)]">
         <div className="max-w-4xl mx-auto px-6">
           <div className="text-center">
             <h1 className="text-3xl sm:text-5xl font-serif font-bold text-[var(--ink)] mb-6 leading-tight">
-              Study Notes
+              Study Helper
             </h1>
             <p className="text-lg text-[var(--ink-light)] max-w-xl mx-auto mb-8 leading-relaxed">
               A personal collection of notes and concepts from my computer science studies. 
@@ -31,6 +42,12 @@ export default function Home() {
                 className="px-5 py-2.5 bg-[var(--paper)] hover:bg-[var(--code-bg)] border border-[var(--border)] text-[var(--ink)] text-sm tracking-wide transition-colors"
               >
                 Test Knowledge
+              </Link>
+              <Link
+                href="/quiz-questions"
+                className="px-5 py-2.5 bg-[var(--paper)] hover:bg-[var(--code-bg)] border border-[var(--border)] text-[var(--ink)] text-sm tracking-wide transition-colors"
+              >
+                View Questions
               </Link>
             </div>
           </div>
@@ -79,7 +96,7 @@ export default function Home() {
               <CategoryCard
                 key={category.id}
                 category={category}
-                topicCount={getTopicsByCategory(category.id).length}
+                topicCount={topicCountsByCategory[category.id] || 0}
               />
             ))}
           </div>
@@ -107,7 +124,7 @@ export default function Home() {
       <footer className="py-8 border-t border-[var(--border)]">
         <div className="max-w-4xl mx-auto px-6">
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
-            <span className="font-serif text-[var(--ink)]">Study Notes</span>
+            <span className="font-serif text-[var(--ink)]">Study Helper</span>
             <p className="text-[var(--ink-light)] text-sm">
               Vibe coded with Next.js &amp; TypeScript
             </p>

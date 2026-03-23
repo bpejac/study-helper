@@ -220,5 +220,5 @@ console.log(-8 >>> 1);  // 2147483644  (logical: fills with 0)
       explanation: "JavaScript's bitwise operators convert numbers to 32-bit signed integers (two's complement). ~x = -(x+1) is the bitwise NOT identity. XOR swap is a classic interview trick. The >>> operator (logical right shift) is unique to JS and treats the number as unsigned.",
     },
   ],
-  resources: ['Computer Organization and Design - Patterson & Hennessy'],
+
 };

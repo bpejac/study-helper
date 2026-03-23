@@ -1,22 +1,44 @@
 'use client';
 
-import { Suspense } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { TopicCard } from '@/components';
-import { searchTopics } from '@/data/knowledge';
+import type { Topic } from '@/types';
 
 function SearchResults() {
   const searchParams = useSearchParams();
   const query = searchParams.get('q') || '';
-  const results = query ? searchTopics(query) : [];
+  const [results, setResults] = useState<Topic[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    if (!query) {
+      setResults([]);
+      return;
+    }
+
+    setIsLoading(true);
+    fetch(`/api/topics?search=${encodeURIComponent(query)}`)
+      .then(res => res.json())
+      .then(data => {
+        setResults(data);
+        setIsLoading(false);
+      })
+      .catch(err => {
+        console.error('Search error:', err);
+        setIsLoading(false);
+      });
+  }, [query]);
 
   return (
     <>
       {/* Header */}
       <div className="mb-10">
         <h1 className="text-2xl font-serif font-bold text-[var(--ink)] mb-3">Search Results</h1>
-        {query ? (
+        {isLoading ? (
+          <p className="text-[var(--ink-light)]">Searching...</p>
+        ) : query ? (
           <p className="text-[var(--ink-light)]">
             Found {results.length} result{results.length !== 1 ? 's' : ''} for &quot;{query}&quot;
           </p>
@@ -26,7 +48,11 @@ function SearchResults() {
       </div>
 
       {/* Results */}
-      {results.length > 0 ? (
+      {isLoading ? (
+        <div className="text-center py-16">
+          <p className="text-[var(--ink-light)]">Loading...</p>
+        </div>
+      ) : results.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {results.map((topic) => (
             <TopicCard key={topic.id} topic={topic} />
@@ -70,7 +96,7 @@ function SearchLoading() {
 
 export default function SearchPage() {
   return (
-    <div className="min-h-screen py-12">
+    <div className="py-12">
       <div className="max-w-4xl mx-auto px-6">
         <Suspense fallback={<SearchLoading />}>
           <SearchResults />

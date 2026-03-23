@@ -229,5 +229,4 @@ export default async function Layout({ children }: { children: React.ReactNode }
       explanation: 'The "donut" pattern lets you use Server Components inside Client Components by passing them as children. The server-rendered nav (with DB data) is passed as children to the interactive client sidebar. The Server Component is rendered by the parent layout (a Server Component), not by the Client Component.',
     },
   ],
-  resources: ['Next.js Documentation', 'React Server Components RFC', 'Vercel Blog'],
 };

@@ -218,5 +218,4 @@ Convert 0.1 (decimal) to binary:
       explanation: 'The fundamental issue: a number that terminates in decimal may repeat infinitely in binary (and vice versa). Only fractions with power-of-2 denominators (1/2, 1/4, 1/8, 3/4, etc.) are exact in binary floating point. This is why 0.1, 0.2, and 0.3 all have rounding errors.',
     },
   ],
-  resources: ['IEEE 754-2019 Standard', 'What Every Computer Scientist Should Know About Floating-Point Arithmetic'],
 };

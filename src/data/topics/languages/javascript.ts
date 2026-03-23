@@ -202,5 +202,4 @@ class Cat extends Animal {
       explanation: '"this" is determined by the call site, not definition. Arrow functions have no own "this". Class syntax is sugar over the prototype chain — Dog.prototype = Object.create(Animal.prototype) is what extends does under the hood.',
     },
   ],
-  resources: ['MDN Web Docs', 'JavaScript.info', 'You Don\'t Know JS book series'],
 };

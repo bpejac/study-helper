@@ -280,5 +280,4 @@ function TodoApp() {
       explanation: 'useReducer centralizes complex state transitions into a pure reducer function. Actions are typed discriminated unions for type safety. The dispatch function is stable across renders (unlike setState closures), making it safe to pass to children without useCallback.',
     },
   ],
-  resources: ['React Documentation', 'React Patterns', 'Kent C. Dodds Blog'],
 };

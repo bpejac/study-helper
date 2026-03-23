@@ -1,15 +1,31 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useUserData, TopicCard } from '@/components';
-import { topics, getTopicById } from '@/data/knowledge';
+import type { Topic } from '@/types';
 
 export default function FavoritesPage() {
   const { favorites, getMissedQuestions, clearQuizHistory } = useUserData();
+  const [allTopics, setAllTopics] = useState<Topic[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
   
+  useEffect(() => {
+    fetch('/api/topics')
+      .then(res => res.json())
+      .then(data => {
+        setAllTopics(data);
+        setIsLoading(false);
+      })
+      .catch(err => {
+        console.error('Error loading topics:', err);
+        setIsLoading(false);
+      });
+  }, []);
+
   const favoriteTopics = favorites
-    .map(id => getTopicById(id))
-    .filter((topic): topic is NonNullable<typeof topic> => topic !== undefined);
+    .map(id => allTopics.find(t => t.id === id))
+    .filter((topic): topic is Topic => topic !== undefined);
   
   const missedQuestions = getMissedQuestions();
 
@@ -29,7 +45,11 @@ export default function FavoritesPage() {
             Favorite Topics ({favoriteTopics.length})
           </h2>
           
-          {favoriteTopics.length > 0 ? (
+          {isLoading ? (
+            <div className="text-center py-12">
+              <p className="text-[var(--ink-light)]">Loading...</p>
+            </div>
+          ) : favoriteTopics.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
               {favoriteTopics.map(topic => (
                 <TopicCard key={topic.id} topic={topic} />
@@ -64,7 +84,7 @@ export default function FavoritesPage() {
           {missedQuestions.length > 0 ? (
             <div className="space-y-4">
               {missedQuestions.map((item, idx) => {
-                const topic = getTopicById(item.topicId);
+                const topic = allTopics.find(t => t.id === item.topicId);
                 return (
                   <div
                     key={idx}

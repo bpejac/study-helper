@@ -28,7 +28,7 @@ interface UserDataContextType {
 
 const UserDataContext = createContext<UserDataContextType | undefined>(undefined);
 
-const STORAGE_KEY = 'studyNotes_userData';
+const STORAGE_KEY = 'studyHelper_userData';
 
 const defaultUserData: UserData = {
   favorites: [],

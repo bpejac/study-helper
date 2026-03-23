@@ -188,5 +188,4 @@ console.log('6. Synchronous');
       explanation: 'Understanding execution order is critical for avoiding subtle bugs. Microtasks (nextTick, Promises) always run before the next event loop phase.',
     },
   ],
-  resources: ['Node.js Documentation', 'Node.js Design Patterns book'],
 };

@@ -238,5 +238,4 @@ jobs:
       explanation: 'GitHub Actions matrix builds each platform on its native runner. Signing credentials are stored as encrypted secrets. The --publish always flag uploads artifacts to GitHub Releases for auto-updates.',
     },
   ],
-  resources: ['Electron Builder docs', 'Apple Developer Documentation', 'Microsoft Partner Center'],
 };

@@ -224,5 +224,4 @@ type EventName = \`on\$\{Capitalize<'click' | 'focus' | 'blur'>\}\`;
       explanation: 'Utility types transform existing types without redefining them. Mapped types iterate over keys with [K in keyof T]. Conditional types (extends ? :) enable type-level programming. Template literal types combine string manipulation with the type system.',
     },
   ],
-  resources: ['TypeScript Handbook', 'TypeScript Deep Dive', 'Type Challenges'],
 };

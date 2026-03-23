@@ -24,7 +24,6 @@ export interface Topic {
   keyPoints: KeyPoint[];
   codeExamples: CodeExample[];
   quizQuestions?: QuizQuestion[];
-  resources?: string[];
   lastReviewed?: string;
   confidence: 'beginner' | 'intermediate' | 'advanced' | 'expert';
 }
@@ -34,5 +33,4 @@ export interface Category {
   name: string;
   description: string;
   icon: string;
-  color: string;
 }

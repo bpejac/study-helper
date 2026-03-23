@@ -43,24 +43,6 @@ body {
 }
 
 /* Paper texture background */
-.paper-bg {
-  background-color: var(--paper);
-  background-image: 
-    linear-gradient(90deg, transparent 79px, var(--border) 79px, var(--border) 81px, transparent 81px),
-    linear-gradient(var(--border) .1em, transparent .1em);
-  background-size: 100% 1.5em;
-}
-
-/* Notebook lines */
-.notebook-lines {
-  background-image: repeating-linear-gradient(
-    transparent,
-    transparent 31px,
-    var(--border) 31px,
-    var(--border) 32px
-  );
-}
-
 /* Custom scrollbar */
 ::-webkit-scrollbar {
   width: 8px;
@@ -108,12 +90,6 @@ code {
   font-family: 'Courier New', Courier, monospace;
 }
 
-/* Handwritten style accent */
-.handwritten {
-  font-family: 'Georgia', serif;
-  font-style: italic;
-}
-
 /* Paper shadow */
 .paper-shadow {
   box-shadow: 
@@ -125,13 +101,6 @@ code {
   box-shadow: 
     0 1px 3px rgba(0,0,0,0.3),
     0 4px 12px rgba(0,0,0,0.2);
-}
-
-/* Underline accent */
-.underline-accent {
-  text-decoration: underline;
-  text-decoration-color: var(--accent);
-  text-underline-offset: 4px;
 }
 
 /* Theme transition */
