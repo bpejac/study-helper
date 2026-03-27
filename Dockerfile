@@ -1,5 +1,5 @@
 # Build stage
-FROM node:24-alpine AS builder
+FROM node:25-alpine AS builder
 
 WORKDIR /app
 
@@ -61,6 +61,7 @@ EXPOSE 3000
 # Set environment variables
 ENV NODE_ENV=production
 ENV DATABASE_URL="file:/app/data/prisma.db"
+ENV PORT=3000
 
 # Run migrations and start the app
 CMD ["sh", "-c", "npx prisma migrate deploy && npm start"]
