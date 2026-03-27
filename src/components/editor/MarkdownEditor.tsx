@@ -28,7 +28,7 @@ export default function MarkdownEditor({
   return (
     <div>
       <label htmlFor={id} className="block text-sm font-medium text-[var(--ink)] mb-2">
-        {label}
+        {label}{required && <span className="text-[var(--accent)]">*</span>}
       </label>
       <textarea
         id={id}

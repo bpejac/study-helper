@@ -3,108 +3,190 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { usePathname, useRouter } from 'next/navigation';
+import { signOut, useSession } from 'next-auth/react';
 import { useTheme } from './ThemeProvider';
 
 export default function Header() {
   const [searchQuery, setSearchQuery] = useState('');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const router = useRouter();
   const pathname = usePathname();
   const { theme, toggleTheme } = useTheme();
-  const isAdminRoute = pathname.startsWith('/admin');
+  const { status } = useSession();
+  const isAdmin = status === 'authenticated';
+  const showSearch = pathname !== '/login';
 
-  const navLinks = isAdminRoute
-    ? [
-        { href: '/admin', label: 'Dashboard' },
-        { href: '/admin/categories', label: 'Categories' },
-        { href: '/admin/topics', label: 'Topics' },
-        { href: '/admin/change-password', label: 'Password' },
-      ]
-    : [
-        { href: '/', label: 'Home' },
-        { href: '/categories', label: 'Subjects' },
-        { href: '/quiz', label: 'Quiz' },
-        { href: '/quiz-questions', label: 'Questions' },
-        { href: '/favorites', label: 'My List' },
-      ];
+  const navLinks = [
+    { href: '/', label: 'Home' },
+    { href: '/categories', label: 'Subjects' },
+    { href: '/quiz', label: 'Quiz' },
+    { href: '/quiz-questions', label: 'Questions' },
+    { href: '/favorites', label: 'My List' },
+  ];
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     if (searchQuery.trim()) {
       router.push(`/search?q=${encodeURIComponent(searchQuery)}`);
+      setIsMobileMenuOpen(false);
     }
   };
 
   return (
     <header className="sticky top-0 z-50 bg-[var(--background)]/95 backdrop-blur-sm border-b border-[var(--border)]">
-      <div className="max-w-4xl mx-auto px-6">
-        <div className="flex items-center justify-between h-16">
-          <Link href={isAdminRoute ? '/admin' : '/'} className="flex items-center space-x-2">
-            <span className="text-2xl font-serif font-bold text-[var(--ink)] tracking-tight">
-              Study Helper
-            </span>
-          </Link>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6">
+        <div className="py-3">
+          <div className="flex items-center justify-between gap-3">
+            <Link href="/" className="flex items-center shrink-0">
+              <span className="text-xl sm:text-2xl font-serif font-bold text-[var(--ink)] tracking-tight whitespace-nowrap">
+                Study Helper
+              </span>
+            </Link>
 
-          <nav className="hidden md:flex items-center space-x-8">
+            <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+              {isAdmin && (
+                <span className="hidden lg:inline-flex text-xs border border-[var(--accent)] text-[var(--accent)] px-2 py-1 whitespace-nowrap">
+                  Editing enabled
+                </span>
+              )}
+
+              {showSearch && (
+                <form onSubmit={handleSearch} className="hidden md:flex items-center min-w-0">
+                  <div className="relative">
+                    <input
+                      type="text"
+                      placeholder="Search notes..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-36 lg:w-48 xl:w-56 px-4 py-2 pl-9 bg-[var(--paper)] border border-[var(--border)] rounded text-[var(--ink)] placeholder-[var(--ink-light)] text-sm focus:outline-none focus:border-[var(--accent)] transition-colors"
+                    />
+                    <svg
+                      className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--ink-light)]"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={1.5}
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                      />
+                    </svg>
+                  </div>
+                </form>
+              )}
+
+              {!isAdmin && pathname !== '/login' && (
+                <Link
+                  href="/login"
+                  className="text-xs text-[var(--ink-light)] hover:text-[var(--ink)] transition-colors border border-[var(--border)] px-2 py-1 whitespace-nowrap"
+                >
+                  Login
+                </Link>
+              )}
+
+              {isAdmin && (
+                <button
+                  type="button"
+                  onClick={() => signOut({ callbackUrl: '/' })}
+                  className="text-xs text-[var(--ink-light)] hover:text-[var(--ink)] transition-colors border border-[var(--border)] px-2 py-1 cursor-pointer whitespace-nowrap"
+                >
+                  Logout
+                </button>
+              )}
+
+              <button
+                onClick={toggleTheme}
+                className="p-2 text-[var(--ink-light)] hover:text-[var(--ink)] transition-colors cursor-pointer shrink-0"
+                aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+              >
+                {theme === 'light' ? (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                  </svg>
+                ) : (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setIsMobileMenuOpen((prev) => !prev)}
+                className="md:hidden p-2 text-[var(--ink-light)] hover:text-[var(--ink)] transition-colors border border-[var(--border)]"
+                aria-label="Toggle navigation menu"
+                aria-expanded={isMobileMenuOpen}
+              >
+                {isMobileMenuOpen ? (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                ) : (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 6h16M4 12h16M4 18h16" />
+                  </svg>
+                )}
+              </button>
+            </div>
+          </div>
+
+          <nav className="hidden md:flex items-center gap-6 mt-3 pt-3 border-t border-[var(--border)]">
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-[var(--ink-light)] hover:text-[var(--ink)] transition-colors text-sm tracking-wide"
+                className="text-[var(--ink-light)] hover:text-[var(--ink)] transition-colors text-sm tracking-wide whitespace-nowrap"
               >
                 {link.label}
               </Link>
             ))}
-            {isAdminRoute && (
-              <Link href="/" className="text-[var(--accent)] hover:text-[var(--ink)] transition-colors text-sm tracking-wide">
-                View Site
-              </Link>
-            )}
           </nav>
 
-          <div className="flex items-center space-x-3">
-            {!isAdminRoute && (
-              <form onSubmit={handleSearch} className="flex items-center">
-                <div className="relative">
-                  <input
-                    type="text"
-                    placeholder="Search notes..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-40 sm:w-48 px-4 py-2 pl-9 bg-[var(--paper)] border border-[var(--border)] rounded text-[var(--ink)] placeholder-[var(--ink-light)] text-sm focus:outline-none focus:border-[var(--accent)] transition-colors"
-                  />
-                  <svg
-                    className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--ink-light)]"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={1.5}
-                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+          {isMobileMenuOpen && (
+            <div className="md:hidden mt-3 pt-3 border-t border-[var(--border)] space-y-3">
+              {showSearch && (
+                <form onSubmit={handleSearch} className="flex items-center">
+                  <div className="relative w-full">
+                    <input
+                      type="text"
+                      placeholder="Search notes..."
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      className="w-full px-4 py-2 pl-9 bg-[var(--paper)] border border-[var(--border)] rounded text-[var(--ink)] placeholder-[var(--ink-light)] text-sm focus:outline-none focus:border-[var(--accent)] transition-colors"
                     />
-                  </svg>
-                </div>
-              </form>
-            )}
-
-            <button
-              onClick={toggleTheme}
-              className="p-2 text-[var(--ink-light)] hover:text-[var(--ink)] transition-colors cursor-pointer"
-              aria-label={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
-            >
-              {theme === 'light' ? (
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
-                </svg>
-              ) : (
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
+                    <svg
+                      className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--ink-light)]"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={1.5}
+                        d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                      />
+                    </svg>
+                  </div>
+                </form>
               )}
-            </button>
-          </div>
+
+              <nav className="flex flex-col gap-2">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setIsMobileMenuOpen(false)}
+                    className="text-[var(--ink-light)] hover:text-[var(--ink)] transition-colors text-sm tracking-wide py-1"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </nav>
+            </div>
+          )}
         </div>
       </div>
     </header>

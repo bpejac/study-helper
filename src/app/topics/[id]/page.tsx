@@ -1,6 +1,8 @@
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
-import { CodeBlock, FavoriteButton, Markdown } from '@/components';
+import { FavoriteButton, Markdown } from '@/components';
+import TopicEditModal from '@/components/editor/TopicEditModal';
+import TopicInlineSections from '@/components/editor/TopicInlineSections';
 import { getTopicById, getCategoryById } from '@/lib/data';
 
 export const dynamic = 'force-dynamic';
@@ -66,6 +68,7 @@ export default async function TopicPage({ params }: TopicPageProps) {
               <span className="text-xs text-[var(--ink-light)] font-mono border border-[var(--border)] px-2 py-1 bg-[var(--paper)]">
                 {confidenceLabels[topic.confidence]}
               </span>
+              <TopicEditModal topic={topic} />
             </div>
           </div>
           <div className="text-lg text-[var(--ink-light)] leading-relaxed">
@@ -73,101 +76,7 @@ export default async function TopicPage({ params }: TopicPageProps) {
           </div>
         </header>
 
-        {/* Key Points */}
-        <details open className="group mb-10">
-          <summary className="flex items-center justify-between cursor-pointer list-none mb-5 pb-2 border-b border-[var(--border)]">
-            <h2 className="text-xl font-serif font-semibold text-[var(--ink)]">
-              Key Points
-            </h2>
-            <svg
-              className="w-5 h-5 text-[var(--ink-light)] transition-transform group-open:rotate-180"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 9l-7 7-7-7" />
-            </svg>
-          </summary>
-          <div className="space-y-4">
-            {topic.keyPoints.map((point, idx) => (
-              <div
-                key={idx}
-                className="bg-[var(--paper)] border border-[var(--border)] p-4 paper-shadow"
-              >
-                <h3 className="font-serif font-semibold text-[var(--ink)] mb-1">{point.title}</h3>
-                <div className="text-[var(--ink-light)] text-sm leading-relaxed">
-                  <Markdown>{point.description}</Markdown>
-                </div>
-              </div>
-            ))}
-          </div>
-        </details>
-
-        {/* Code Examples */}
-        {topic.codeExamples.length > 0 && (
-          <details className="group mb-10">
-            <summary className="flex items-center justify-between cursor-pointer list-none mb-5 pb-2 border-b border-[var(--border)]">
-              <h2 className="text-xl font-serif font-semibold text-[var(--ink)]">
-                Code Examples
-              </h2>
-              <svg
-                className="w-5 h-5 text-[var(--ink-light)] transition-transform group-open:rotate-180"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 9l-7 7-7-7" />
-              </svg>
-            </summary>
-            <div className="space-y-6">
-              {topic.codeExamples.map((example, idx) => (
-                <CodeBlock key={idx} example={example} />
-              ))}
-            </div>
-          </details>
-        )}
-
-        {topic.quizQuestions && topic.quizQuestions.length > 0 && (
-          <details className="group mb-10">
-            <summary className="flex items-center justify-between cursor-pointer list-none mb-5 pb-2 border-b border-[var(--border)]">
-              <h2 className="text-xl font-serif font-semibold text-[var(--ink)]">
-                Questions
-              </h2>
-              <svg
-                className="w-5 h-5 text-[var(--ink-light)] transition-transform group-open:rotate-180"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19 9l-7 7-7-7" />
-              </svg>
-            </summary>
-            <div className="space-y-4">
-              {topic.quizQuestions.map((item, idx) => (
-                <div
-                  key={idx}
-                  className="bg-[var(--paper)] border border-[var(--border)] p-4 paper-shadow"
-                >
-                  <h3 className="font-serif font-semibold text-[var(--ink)] mb-2">
-                    Question {idx + 1}
-                  </h3>
-                  <div className="text-[var(--ink)] leading-relaxed mb-4">
-                    <Markdown>{item.question}</Markdown>
-                  </div>
-                  <div className="pt-3 border-t border-[var(--border)]">
-                    <div className="text-xs uppercase tracking-[0.2em] text-[var(--ink-light)] mb-2">
-                      Answer
-                    </div>
-                    <div className="text-[var(--ink-light)] text-sm leading-relaxed">
-                      <Markdown>{item.answer}</Markdown>
-                    </div>
-                  </div>
-                </div>
-              ))}
-            </div>
-          </details>
-        )}
-
+        <TopicInlineSections topic={topic} />
 
         {/* Navigation */}
         <div className="border-t border-[var(--border)] pt-8 mt-10">

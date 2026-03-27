@@ -1,17 +1,26 @@
 'use client';
 
-import { signIn } from 'next-auth/react';
-import { useState, Suspense } from 'react';
+import { signIn, useSession } from 'next-auth/react';
+import { useState, Suspense, useEffect } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
+import Button from '@/components/Button';
 
 function LoginForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { status } = useSession();
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (status === 'authenticated') {
+      const callbackUrl = searchParams.get('callbackUrl') || '/';
+      router.push(callbackUrl);
+    }
+  }, [status, searchParams, router]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,11 +37,11 @@ function LoginForm() {
       if (result?.error) {
         setError('Invalid username or password');
       } else {
-        const callbackUrl = searchParams.get('callbackUrl') || '/admin';
+        const callbackUrl = searchParams.get('callbackUrl') || '/';
         router.push(callbackUrl);
         router.refresh();
       }
-    } catch (err) {
+    } catch {
       setError('An error occurred. Please try again.');
     } finally {
       setLoading(false);
@@ -43,11 +52,9 @@ function LoginForm() {
     <div className="min-h-screen flex items-center justify-center px-4">
       <div className="max-w-md w-full bg-[var(--paper)] border border-[var(--border)] p-8">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold text-[var(--ink)]">
-            Admin Login
-          </h1>
+          <h1 className="text-3xl font-bold text-[var(--ink)]">Admin Login</h1>
           <p className="text-[var(--ink-light)] mt-2">
-            Sign in to manage your study helper content
+            Sign in only if you want to edit learning content.
           </p>
         </div>
 
@@ -94,13 +101,9 @@ function LoginForm() {
             />
           </div>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-[var(--ink)] text-[var(--background)] py-3 px-4 font-semibold hover:opacity-80 transition disabled:opacity-50 cursor-pointer"
-          >
+          <Button type="submit" tone="primary" size="lg" disabled={loading} className="w-full">
             {loading ? 'Signing in...' : 'Sign In'}
-          </button>
+          </Button>
         </form>
 
         <div className="mt-6 text-center">
@@ -108,7 +111,7 @@ function LoginForm() {
             href="/"
             className="text-sm text-[var(--ink-light)] hover:underline cursor-pointer"
           >
-            ← Back to Study Helper
+            Continue browsing without login
           </Link>
         </div>
       </div>
@@ -116,13 +119,15 @@ function LoginForm() {
   );
 }
 
-export default function AdminLogin() {
+export default function LoginPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-[var(--ink)]">Loading...</div>
-      </div>
-    }>
+    <Suspense
+      fallback={
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-[var(--ink)]">Loading...</div>
+        </div>
+      }
+    >
       <LoginForm />
     </Suspense>
   );

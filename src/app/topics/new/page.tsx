@@ -1,10 +1,11 @@
 'use client';
 
 import { useSession } from 'next-auth/react';
-import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useMemo, useState } from 'react';
 import Link from 'next/link';
-import MarkdownEditor from '@/components/admin/MarkdownEditor';
+import Button from '@/components/Button';
+import MarkdownEditor from '@/components/editor/MarkdownEditor';
 
 interface Category {
   id: string;
@@ -28,18 +29,22 @@ interface QuizQuestion {
   answer: string;
 }
 
-export default function NewTopic() {
+export default function NewTopicPage() {
   const { status } = useSession();
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const initialCategoryId = useMemo(() => searchParams.get('categoryId') || '', [searchParams]);
+
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
+  const [isDirty, setIsDirty] = useState(false);
   const [formData, setFormData] = useState({
     id: '',
     title: '',
     description: '',
     icon: '',
-    categoryId: '',
+    categoryId: initialCategoryId,
     confidence: 'beginner',
     keyPoints: [] as KeyPoint[],
     codeExamples: [] as CodeExample[],
@@ -48,15 +53,32 @@ export default function NewTopic() {
 
   useEffect(() => {
     if (status === 'unauthenticated') {
-      router.push('/admin/login');
+      const callbackUrl = initialCategoryId ? `/topics/new?categoryId=${initialCategoryId}` : '/topics/new';
+      router.push(`/login?callbackUrl=${encodeURIComponent(callbackUrl)}`);
     }
-  }, [status, router]);
+  }, [status, router, initialCategoryId]);
 
   useEffect(() => {
     if (status === 'authenticated') {
       fetchCategories();
     }
   }, [status]);
+
+  useEffect(() => {
+    if (initialCategoryId) {
+      setFormData((prev) => ({ ...prev, categoryId: initialCategoryId }));
+    }
+  }, [initialCategoryId]);
+
+  useEffect(() => {
+    const handleBeforeUnload = (e: BeforeUnloadEvent) => {
+      if (isDirty) {
+        e.preventDefault();
+      }
+    };
+    window.addEventListener('beforeunload', handleBeforeUnload);
+    return () => window.removeEventListener('beforeunload', handleBeforeUnload);
+  }, [isDirty]);
 
   const fetchCategories = async () => {
     try {
@@ -86,7 +108,9 @@ export default function NewTopic() {
         throw new Error(data.error || 'Failed to create topic');
       }
 
-      router.push('/admin/topics');
+      setIsDirty(false);
+      router.push(`/categories/${formData.categoryId}`);
+      router.refresh();
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create topic');
     } finally {
@@ -97,10 +121,19 @@ export default function NewTopic() {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
+    setIsDirty(true);
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
+  const handleBack = () => {
+    if (isDirty && !window.confirm('You have unsaved changes. Are you sure you want to leave?')) {
+      return;
+    }
+    router.push(formData.categoryId ? `/categories/${formData.categoryId}` : '/categories');
+  };
+
   const addKeyPoint = () => {
+    setIsDirty(true);
     setFormData({
       ...formData,
       keyPoints: [...formData.keyPoints, { title: '', description: '' }],
@@ -108,6 +141,7 @@ export default function NewTopic() {
   };
 
   const removeKeyPoint = (index: number) => {
+    setIsDirty(true);
     setFormData({
       ...formData,
       keyPoints: formData.keyPoints.filter((_, i) => i !== index),
@@ -115,12 +149,14 @@ export default function NewTopic() {
   };
 
   const updateKeyPoint = (index: number, field: keyof KeyPoint, value: string) => {
+    setIsDirty(true);
     const updated = [...formData.keyPoints];
     updated[index] = { ...updated[index], [field]: value };
     setFormData({ ...formData, keyPoints: updated });
   };
 
   const addCodeExample = () => {
+    setIsDirty(true);
     setFormData({
       ...formData,
       codeExamples: [
@@ -131,6 +167,7 @@ export default function NewTopic() {
   };
 
   const removeCodeExample = (index: number) => {
+    setIsDirty(true);
     setFormData({
       ...formData,
       codeExamples: formData.codeExamples.filter((_, i) => i !== index),
@@ -138,12 +175,14 @@ export default function NewTopic() {
   };
 
   const updateCodeExample = (index: number, field: keyof CodeExample, value: string) => {
+    setIsDirty(true);
     const updated = [...formData.codeExamples];
     updated[index] = { ...updated[index], [field]: value };
     setFormData({ ...formData, codeExamples: updated });
   };
 
   const addQuizQuestion = () => {
+    setIsDirty(true);
     setFormData({
       ...formData,
       quizQuestions: [...formData.quizQuestions, { question: '', answer: '' }],
@@ -151,6 +190,7 @@ export default function NewTopic() {
   };
 
   const removeQuizQuestion = (index: number) => {
+    setIsDirty(true);
     setFormData({
       ...formData,
       quizQuestions: formData.quizQuestions.filter((_, i) => i !== index),
@@ -158,6 +198,7 @@ export default function NewTopic() {
   };
 
   const updateQuizQuestion = (index: number, field: keyof QuizQuestion, value: string) => {
+    setIsDirty(true);
     const updated = [...formData.quizQuestions];
     updated[index] = { ...updated[index], [field]: value };
     setFormData({ ...formData, quizQuestions: updated });
@@ -176,15 +217,10 @@ export default function NewTopic() {
       <div className="max-w-4xl mx-auto px-4 sm:px-6">
         <div className="bg-[var(--paper)] border border-[var(--border)] p-6 mb-6">
           <div className="flex justify-between items-center">
-            <h1 className="text-3xl font-bold text-[var(--ink)]">
-              Create New Topic
-            </h1>
-            <Link
-              href="/admin/topics"
-              className="px-4 py-2 border border-[var(--border)] text-[var(--ink)] hover:opacity-80 transition cursor-pointer"
-            >
-              ← Back
-            </Link>
+            <h1 className="text-3xl font-bold text-[var(--ink)]">Create New Topic</h1>
+            <Button type="button" size="md" onClick={handleBack}>
+              Back
+            </Button>
           </div>
         </div>
 
@@ -195,7 +231,6 @@ export default function NewTopic() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          {/* Basic Information */}
           <div className="bg-[var(--paper)] border border-[var(--border)] p-6 space-y-6">
             <h2 className="text-xl font-bold text-[var(--ink)]">Basic Information</h2>
 
@@ -231,17 +266,15 @@ export default function NewTopic() {
               />
             </div>
 
-            <div>
-              <MarkdownEditor
-                id="description"
-                name="description"
-                label="Description *"
-                value={formData.description}
-                onChange={(value) => setFormData({ ...formData, description: value })}
-                required
-                rows={3}
-              />
-            </div>
+            <MarkdownEditor
+              id="description"
+              name="description"
+              label="Description"
+              value={formData.description}
+              onChange={(value) => { setIsDirty(true); setFormData({ ...formData, description: value }); }}
+              required
+              rows={3}
+            />
 
             <div>
               <label htmlFor="icon" className="block text-sm font-medium text-[var(--ink)] mb-2">
@@ -299,32 +332,21 @@ export default function NewTopic() {
             </div>
           </div>
 
-          {/* Key Points */}
           <div className="bg-[var(--paper)] border border-[var(--border)] p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold text-[var(--ink)]">Key Points</h2>
-              <button
-                type="button"
-                onClick={addKeyPoint}
-                className="px-4 py-2 bg-[var(--ink)] text-[var(--background)] hover:opacity-80 transition cursor-pointer"
-              >
-                + Add Key Point
-              </button>
+              <Button type="button" tone="primary" size="md" onClick={addKeyPoint}>
+                Add Key Point
+              </Button>
             </div>
             <div className="space-y-4">
               {formData.keyPoints.map((kp, index) => (
                 <div key={index} className="border border-[var(--border)] p-4">
                   <div className="flex justify-between items-start mb-3">
-                    <span className="text-sm font-medium text-[var(--ink)]">
-                      Key Point #{index + 1}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => removeKeyPoint(index)}
-                      className="text-[var(--ink)] hover:opacity-80 cursor-pointer"
-                    >
+                    <span className="text-sm font-medium text-[var(--ink)]">Key Point #{index + 1}</span>
+                    <Button type="button" onClick={() => removeKeyPoint(index)}>
                       Remove
-                    </button>
+                    </Button>
                   </div>
                   <input
                     type="text"
@@ -346,32 +368,21 @@ export default function NewTopic() {
             </div>
           </div>
 
-          {/* Code Examples */}
           <div className="bg-[var(--paper)] border border-[var(--border)] p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold text-[var(--ink)]">Code Examples</h2>
-              <button
-                type="button"
-                onClick={addCodeExample}
-                className="px-4 py-2 bg-[var(--ink)] text-[var(--background)] hover:opacity-80 transition cursor-pointer"
-              >
-                + Add Code Example
-              </button>
+              <Button type="button" tone="primary" size="md" onClick={addCodeExample}>
+                Add Code Example
+              </Button>
             </div>
             <div className="space-y-4">
               {formData.codeExamples.map((ce, index) => (
                 <div key={index} className="border border-[var(--border)] p-4">
                   <div className="flex justify-between items-start mb-3">
-                    <span className="text-sm font-medium text-[var(--ink)]">
-                      Code Example #{index + 1}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => removeCodeExample(index)}
-                      className="text-[var(--ink)] hover:opacity-80 cursor-pointer"
-                    >
+                    <span className="text-sm font-medium text-[var(--ink)]">Code Example #{index + 1}</span>
+                    <Button type="button" onClick={() => removeCodeExample(index)}>
                       Remove
-                    </button>
+                    </Button>
                   </div>
                   <input
                     type="text"
@@ -382,7 +393,7 @@ export default function NewTopic() {
                   />
                   <input
                     type="text"
-                    placeholder="Language (e.g., typescript, javascript)"
+                    placeholder="Language"
                     value={ce.language}
                     onChange={(e) => updateCodeExample(index, 'language', e.target.value)}
                     className="w-full px-4 py-2 mb-2 border border-[var(--border)] bg-[var(--background)] text-[var(--ink)]"
@@ -395,7 +406,7 @@ export default function NewTopic() {
                     className="w-full px-4 py-2 mb-2 border border-[var(--border)] bg-[var(--background)] text-[var(--ink)] font-mono text-sm"
                   />
                   <textarea
-                    placeholder="Explanation (optional)"
+                    placeholder="Explanation"
                     value={ce.explanation}
                     onChange={(e) => updateCodeExample(index, 'explanation', e.target.value)}
                     rows={2}
@@ -406,68 +417,52 @@ export default function NewTopic() {
             </div>
           </div>
 
-          {/* Quiz Questions */}
           <div className="bg-[var(--paper)] border border-[var(--border)] p-6">
             <div className="flex justify-between items-center mb-4">
               <h2 className="text-xl font-bold text-[var(--ink)]">Quiz Questions</h2>
-              <button
-                type="button"
-                onClick={addQuizQuestion}
-                className="px-4 py-2 bg-[var(--ink)] text-[var(--background)] hover:opacity-80 transition cursor-pointer"
-              >
-                + Add Question
-              </button>
+              <Button type="button" tone="primary" size="md" onClick={addQuizQuestion}>
+                Add Question
+              </Button>
             </div>
             <div className="space-y-4">
               {formData.quizQuestions.map((qq, index) => (
                 <div key={index} className="border border-[var(--border)] p-4">
                   <div className="flex justify-between items-start mb-3">
-                    <span className="text-sm font-medium text-[var(--ink)]">
-                      Question #{index + 1}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => removeQuizQuestion(index)}
-                      className="text-[var(--ink)] hover:opacity-80 cursor-pointer"
-                    >
+                    <span className="text-sm font-medium text-[var(--ink)]">Question #{index + 1}</span>
+                    <Button type="button" onClick={() => removeQuizQuestion(index)}>
                       Remove
-                    </button>
-                  </div>
-                  <div className="mb-2">
-                    <MarkdownEditor
-                      id={`quiz-question-${index}`}
-                      label="Question"
-                      value={qq.question}
-                      onChange={(value) => updateQuizQuestion(index, 'question', value)}
-                      rows={2}
-                      placeholder="Question"
-                    />
+                    </Button>
                   </div>
                   <MarkdownEditor
-                    id={`quiz-answer-${index}`}
-                    label="Answer"
-                    value={qq.answer}
-                    onChange={(value) => updateQuizQuestion(index, 'answer', value)}
-                    rows={3}
-                    placeholder="Answer"
+                    id={`quiz-question-${index}`}
+                    label="Question"
+                    value={qq.question}
+                    onChange={(value) => updateQuizQuestion(index, 'question', value)}
+                    rows={2}
+                    placeholder="Question"
                   />
+                  <div className="mt-2">
+                    <MarkdownEditor
+                      id={`quiz-answer-${index}`}
+                      label="Answer"
+                      value={qq.answer}
+                      onChange={(value) => updateQuizQuestion(index, 'answer', value)}
+                      rows={3}
+                      placeholder="Answer"
+                    />
+                  </div>
                 </div>
               ))}
             </div>
           </div>
 
-          {/* Submit */}
           <div className="bg-[var(--paper)] border border-[var(--border)] p-6">
             <div className="flex gap-3">
-              <button
-                type="submit"
-                disabled={loading}
-                className="flex-1 bg-[var(--ink)] text-[var(--background)] py-3 px-4 font-semibold hover:opacity-80 transition disabled:opacity-50 cursor-pointer"
-              >
+              <Button type="submit" tone="primary" size="lg" disabled={loading} className="flex-1">
                 {loading ? 'Creating...' : 'Create Topic'}
-              </button>
+              </Button>
               <Link
-                href="/admin/topics"
+                href={formData.categoryId ? `/categories/${formData.categoryId}` : '/categories'}
                 className="px-6 py-3 border border-[var(--border)] text-[var(--ink)] hover:opacity-80 transition text-center cursor-pointer"
               >
                 Cancel

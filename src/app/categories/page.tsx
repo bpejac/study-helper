@@ -1,4 +1,5 @@
 import { CategoryCard } from '@/components';
+import AddCategoryCard from '@/components/AddCategoryCard';
 import { getAllCategories, getAllTopics } from '@/lib/data';
 
 export const dynamic = 'force-dynamic';
@@ -38,6 +39,7 @@ export default async function CategoriesPage() {
               topicCount={topicCountByCategory[category.id] || 0}
             />
           ))}
+          <AddCategoryCard />
         </div>
       </div>
     </div>
