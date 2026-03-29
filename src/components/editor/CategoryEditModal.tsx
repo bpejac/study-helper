@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useCallback, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import Button from '@/components/Button';
@@ -25,6 +25,21 @@ export default function CategoryEditModal({ category }: CategoryEditModalProps) 
     icon: category.icon,
   });
 
+  const closeEditModal = useCallback(() => {
+    setIsEditOpen(false);
+  }, []);
+
+  const openEditModal = useCallback(() => {
+    setFormData({
+      id: category.id,
+      name: category.name,
+      description: category.description,
+      icon: category.icon,
+    });
+    setError('');
+    setIsEditOpen(true);
+  }, [category.description, category.icon, category.id, category.name]);
+
   if (status !== 'authenticated') {
     return null;
   }
@@ -34,19 +49,19 @@ export default function CategoryEditModal({ category }: CategoryEditModalProps) 
   };
 
   const handleDelete = async () => {
-    const confirmed = window.confirm('Delete this category and all of its topics?');
+    const confirmed = window.confirm('Delete this subject and all of its topics?');
     if (!confirmed) return;
 
     setSaving(true);
     try {
       const response = await fetch(`/api/categories/${category.id}`, { method: 'DELETE' });
       if (!response.ok) {
-        throw new Error('Failed to delete category');
+        throw new Error('Failed to delete subject');
       }
       router.push('/categories');
       router.refresh();
     } catch {
-      setError('Failed to delete category');
+      setError('Failed to delete subject');
     } finally {
       setSaving(false);
     }
@@ -66,13 +81,13 @@ export default function CategoryEditModal({ category }: CategoryEditModalProps) 
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || 'Failed to update category');
+        throw new Error(data.error || 'Failed to update subject');
       }
 
       setIsEditOpen(false);
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update category');
+      setError(err instanceof Error ? err.message : 'Failed to update subject');
     } finally {
       setSaving(false);
     }
@@ -80,23 +95,23 @@ export default function CategoryEditModal({ category }: CategoryEditModalProps) 
 
   return (
     <>
-      <Button size="sm" onClick={() => setIsEditOpen(true)}>
+      <Button size="sm" onClick={openEditModal}>
         Edit
       </Button>
 
-      <Modal title="Edit Category" isOpen={isEditOpen} onClose={() => setIsEditOpen(false)}>
+      <Modal title="Edit Subject" isOpen={isEditOpen} onClose={closeEditModal}>
         <CategoryForm
           formData={formData}
           onChange={handleChange}
           onSubmit={handleSubmit}
-          submitLabel="Save Category"
+          submitLabel="Save Subject"
           loadingLabel="Saving..."
           loading={saving}
           error={error}
           idPrefix="edit"
           dangerAction={
             <Button type="button" tone="danger" size="md" disabled={saving} onClick={handleDelete} className="w-full">
-              Delete Category
+              Delete Subject
             </Button>
           }
         />

@@ -303,7 +303,7 @@ export default function NewTopicPage() {
                 required
                 className="w-full px-4 py-3 border border-[var(--border)] bg-[var(--background)] text-[var(--ink)] cursor-pointer"
               >
-                <option value="">Select a category</option>
+                <option value="">Select a subject</option>
                 {categories.map((cat) => (
                   <option key={cat.id} value={cat.id}>
                     {cat.name}

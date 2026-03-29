@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useCallback, useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import Button from '@/components/Button';
@@ -45,11 +45,11 @@ export default function TopicEditModal({ topic }: TopicEditModalProps) {
       .catch(() => undefined);
   }, [status]);
 
-  if (status !== 'authenticated') {
-    return null;
-  }
+  const closeModal = useCallback(() => {
+    setIsOpen(false);
+  }, []);
 
-  const openModal = () => {
+  const openModal = useCallback(() => {
     setFormData({
       title: topic.title,
       description: topic.description,
@@ -59,7 +59,11 @@ export default function TopicEditModal({ topic }: TopicEditModalProps) {
     });
     setError('');
     setIsOpen(true);
-  };
+  }, [topic.categoryId, topic.confidence, topic.description, topic.icon, topic.title]);
+
+  if (status !== 'authenticated') {
+    return null;
+  }
 
   const handleSave = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -114,7 +118,7 @@ export default function TopicEditModal({ topic }: TopicEditModalProps) {
         Edit
       </Button>
 
-      <Modal title="Edit Topic" isOpen={isOpen} onClose={() => setIsOpen(false)}>
+      <Modal title="Edit Topic" isOpen={isOpen} onClose={closeModal}>
         <form onSubmit={handleSave} className="space-y-4">
           {error && <p className="text-sm text-[var(--accent)]">{error}</p>}
           <div>
@@ -145,7 +149,7 @@ export default function TopicEditModal({ topic }: TopicEditModalProps) {
             />
           </div>
           <div>
-            <label className="block text-sm text-[var(--ink)] mb-1">Category</label>
+            <label className="block text-sm text-[var(--ink)] mb-1">Subject</label>
             <select
               value={formData.categoryId}
               onChange={(e) => setFormData((prev) => ({ ...prev, categoryId: e.target.value }))}

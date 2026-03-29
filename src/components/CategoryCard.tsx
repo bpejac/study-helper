@@ -50,18 +50,18 @@ export default function CategoryCard({ category, topicCount }: CategoryCardProps
     e.preventDefault();
     e.stopPropagation();
     
-    const confirmed = window.confirm('Delete this category and all its topics?');
+    const confirmed = window.confirm('Delete this subject and all its topics?');
     if (!confirmed) return;
 
     setSaving(true);
     try {
       const response = await fetch(`/api/categories/${category.id}`, { method: 'DELETE' });
       if (!response.ok) {
-        throw new Error('Failed to delete category');
+        throw new Error('Failed to delete subject');
       }
       router.refresh();
     } catch {
-      setError('Failed to delete category');
+      setError('Failed to delete subject');
     } finally {
       setSaving(false);
     }
@@ -82,13 +82,13 @@ export default function CategoryCard({ category, topicCount }: CategoryCardProps
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || 'Failed to update category');
+        throw new Error(data.error || 'Failed to update subject');
       }
 
       setIsEditOpen(false);
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to update category');
+      setError(err instanceof Error ? err.message : 'Failed to update subject');
     } finally {
       setSaving(false);
     }
@@ -131,12 +131,12 @@ export default function CategoryCard({ category, topicCount }: CategoryCardProps
         )}
       </Card>
 
-      <Modal title="Edit Category" isOpen={isEditOpen} onClose={() => setIsEditOpen(false)}>
+      <Modal title="Edit Subject" isOpen={isEditOpen} onClose={() => setIsEditOpen(false)}>
         <CategoryForm
           formData={formData}
           onChange={handleChange}
           onSubmit={handleSubmit}
-          submitLabel="Save Category"
+          submitLabel="Save Subject"
           loadingLabel="Saving..."
           loading={saving}
           error={error}

@@ -83,7 +83,7 @@ export default function CategoryForm({
         onChange={(value) => onChange('description', value)}
         rows={3}
         required
-        placeholder="Brief description of this category"
+        placeholder="Brief description of this subject"
       />
 
       <div>

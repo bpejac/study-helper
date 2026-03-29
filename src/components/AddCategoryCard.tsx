@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { useSession } from 'next-auth/react';
 import Button from './Button';
+import Card from './Card';
 import Modal from './editor/Modal';
 import CategoryForm, { CategoryFormValues } from './editor/CategoryForm';
 
@@ -58,13 +59,13 @@ export default function AddCategoryCard() {
 
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error || 'Failed to create category');
+        throw new Error(data.error || 'Failed to create subject');
       }
 
       resetAndCloseModal();
       router.refresh();
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to create category');
+      setError(err instanceof Error ? err.message : 'Failed to create subject');
     } finally {
       setLoading(false);
     }
@@ -72,27 +73,23 @@ export default function AddCategoryCard() {
 
   return (
     <>
-      <button
-        type="button"
-        onClick={() => setIsOpen(true)}
-        className="group border-2 border-dashed border-[var(--border)] bg-[var(--paper)] p-6 h-full flex items-center justify-center hover:border-[var(--ink)] hover:bg-[var(--background)] transition-colors cursor-pointer"
-      >
+      <Card as="button" type="button" onClick={() => setIsOpen(true)} className="group p-6 h-full flex items-center justify-center !bg-transparent border-2 border-dashed hover:!bg-[var(--paper)]">
         <div className="text-center">
-          <div className="text-4xl text-[var(--ink-light)] group-hover:text-[var(--ink)] transition-colors">
+          <div className="text-4xl text-[var(--ink-light)] group-hover:text-[var(--accent)] transition-colors">
             +
           </div>
-          <p className="text-sm text-[var(--ink-light)] group-hover:text-[var(--ink)] transition-colors mt-2">
-            Add Category
+          <p className="text-sm text-[var(--ink-light)] group-hover:text-[var(--accent)] transition-colors mt-2">
+            Add Subject
           </p>
         </div>
-      </button>
+      </Card>
 
-      <Modal title="Create New Category" isOpen={isOpen} onClose={handleCloseModal}>
+      <Modal title="Create New Subject" isOpen={isOpen} onClose={handleCloseModal}>
         <CategoryForm
           formData={formData}
           onChange={handleChange}
           onSubmit={handleSubmit}
-          submitLabel="Create Category"
+          submitLabel="Create Subject"
           loadingLabel="Creating..."
           loading={loading}
           error={error}
