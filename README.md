@@ -8,11 +8,11 @@ A personal study helper web application to document and review what I've learned
 
 ## Features
 
-- **📚 Knowledge Categories** - Organize topics by languages, frameworks, concepts, and more
+- **📚 Knowledge Subjects** - Organize topics by languages, frameworks, concepts, and more
 - **📝 Topic Pages** - Detailed pages with key points and code examples
 - **🔍 Search** - Quickly find topics across your entire knowledge base
 - **🧠 Quiz Mode** - Test yourself with flashcard-style questions
-- **✏️ Admin Panel** - Full CRUD interface for managing categories, topics, and content
+- **✏️ Admin Panel** - Full CRUD interface for managing subjects, topics, and content
 - **💾 Database Storage** - Content stored in SQLite with Prisma ORM
 - **🔐 Authentication** - Secure admin login with NextAuth.js
 
@@ -86,19 +86,19 @@ The admin panel provides a complete content management system:
 
 ### Managing Content
 
-- **Categories**: Create, edit, and delete study categories at `/admin/categories`
+- **Subjects**: Create, edit, and delete study subjects at `/admin/subjects` (routes still use `/categories` internally)
 - **Topics**: Manage topics with full editing of key points, code examples, and quiz questions at `/admin/topics`
 - **Real-time Updates**: Changes are immediately reflected on the public-facing site
 
 ### Admin Features
 
-- Visual category management with color preview
+- Visual subject management with color preview
 - Rich topic editor with:
   - Multiple key points
   - Code examples with syntax highlighting
   - Quiz questions for testing
   - Resource links
-- Category filtering for topics
+- Subject filtering for topics
 - Confirmation dialogs for deletions
 - Responsive design for mobile editing
 
@@ -107,7 +107,7 @@ The admin panel provides a complete content management system:
 ### Option 1: Through Admin Panel (Recommended)
 
 1. Log in to `/admin/login`
-2. Navigate to Categories or Topics management
+2. Navigate to Subjects or Topics management
 3. Use the web interface to add/edit content
 
 ### Option 2: Direct Database Seeding
@@ -124,14 +124,14 @@ npx prisma db seed
 src/
 ├── app/                  # Next.js App Router pages
 │   ├── admin/           # Admin panel pages
-│   │   ├── categories/  # Category management
+│   │   ├── subjects/    # Subject management (routes via /categories)
 │   │   ├── topics/      # Topic management
 │   │   └── login/       # Admin login
 │   ├── api/             # API routes
 │   │   ├── auth/        # NextAuth endpoints
-│   │   ├── categories/  # Category CRUD
+│   │   ├── categories/  # Subject CRUD
 │   │   └── topics/      # Topic CRUD
-│   ├── categories/      # Public category pages
+│   ├── categories/      # Public subject pages
 │   ├── topics/          # Public topic pages
 │   ├── search/          # Search page
 │   ├── quiz/            # Quiz mode
@@ -310,34 +310,77 @@ Note: `migrate deploy` is used in production (doesn't prompt, doesn't seed).
 
 ⚠️ **Important Note:** This application now requires a server-side runtime and **cannot be deployed to GitHub Pages** (which only supports static hosting).
 
-### Recommended Hosting Options
+### Docker Deployment (Recommended)
 
-- **Vercel** - Optimal for Next.js apps
-- **Railway** - Easy deployment with database
-- **Render** - Free tier available with persistent storage
-- **DigitalOcean App Platform** - Full control
+The project includes Docker and Docker Compose configuration for easy containerized deployment.
 
-### Production Checklist
+#### Quick Start with Docker Compose
 
-1. Update `NEXTAUTH_SECRET` with a secure random string
-2. Update admin credentials after first login
-3. Set `NEXTAUTH_URL` to your production domain
-4. Configure database backups
-5. Set up SSL/HTTPS
-6. Review and update security headers
+1. Create a `.env` file with required variables:
+```bash
+echo 'AUTH_SECRET="your-secure-random-secret-here"' > .env
+echo 'AUTH_TRUST_HOST="true"' >> .env
+```
 
-## Security Considerations
+2. Start the application:
+```bash
+docker-compose up -d
+```
 
-- Admin routes are protected by middleware
-- Passwords are hashed with bcrypt
-- Session management via NextAuth JWT
-- Database file excluded from git
-- API routes require authentication for mutations
+The app will be available at `http://localhost:3000`. The database and backups are persisted in Docker volumes.
 
-## Contributing
+#### What's Included
 
-This is a personal project, but feel free to fork it for your own use!
+- **Multi-stage build**: Optimized production image with minimal size
+- **SQLite database**: Persisted via Docker volume
+- **Automatic backups**: Daily database backups to `/backups` directory
+- **Health checks**: Container monitoring and auto-restart
+- **Database migrations**: Automatic schema initialization on startup
 
-## License
+#### Environment Variables for Docker
 
-MIT
+- `DATABASE_URL`: Set to `file:/app/data/prisma.db` (configured in docker-compose.yml)
+- `AUTH_SECRET`: **Required**. Generate with: `openssl rand -base64 32`
+- `AUTH_TRUST_HOST`: Set to `"true"` for Docker environments
+- `NEXTAUTH_URL`: Optional, defaults to `http://localhost:3000`
+
+#### Accessing the App
+
+- **Public site**: http://localhost:3000
+- **Admin login**: http://localhost:3000/admin/login
+- **Default credentials**: admin / admin (⚠️ change in production!)
+
+#### Database Backups
+
+Backups are created daily and stored in `./backups/`. Format: `prisma-YYYYMMDD-HHMMSS.db`
+
+#### Stopping the Application
+
+```bash
+docker-compose down
+
+# To also remove the database volume (WARNING: deletes data)
+docker-compose down -v
+```
+
+#### Viewing Logs
+
+```bash
+docker-compose logs -f study-helper
+```
+
+#### Advanced Docker Commands
+
+```bash
+# Rebuild the image
+docker-compose build --no-cache
+
+# Run database migrations in container
+docker-compose exec study-helper npx prisma migrate deploy
+
+# Open Prisma Studio in container
+docker-compose exec study-helper npx prisma studio
+
+# Execute custom commands
+docker-compose exec study-helper npm run lint
+```

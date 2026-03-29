@@ -8,6 +8,7 @@
     "start": "next start -p 3000",
     "lint": "eslint"
   },
+  "license": "UNLICENSED",
   "dependencies": {
     "@prisma/adapter-better-sqlite3": "^7.4.0",
     "@prisma/client": "^7.4.0",
