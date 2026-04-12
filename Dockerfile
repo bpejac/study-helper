@@ -1,5 +1,7 @@
+# syntax=docker/dockerfile:1.7
+
 # Build stage
-FROM node:25-alpine AS builder
+FROM node:24-alpine AS builder
 
 WORKDIR /app
 
@@ -7,7 +9,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install dependencies (including dev dependencies for build)
-RUN npm ci
+RUN --mount=type=cache,target=/root/.npm npm ci --no-audit --no-fund
 
 # Copy prisma schema and source code
 COPY prisma ./prisma
@@ -21,10 +23,6 @@ RUN npx prisma generate
 # Create data directory for SQLite database during build
 RUN mkdir -p /app/data
 
-# Set DATABASE_URL for build stage and initialize database
-ENV DATABASE_URL="file:/app/data/prisma.db"
-RUN DATABASE_URL="file:/app/data/prisma.db" npx prisma migrate deploy
-
 # Build Next.js app
 RUN npm run build
 
@@ -37,7 +35,7 @@ WORKDIR /app
 COPY package*.json ./
 
 # Install only production dependencies
-RUN npm ci --omit=dev
+RUN --mount=type=cache,target=/root/.npm npm ci --omit=dev --no-audit --no-fund
 
 # Copy prisma schema and config
 COPY prisma ./prisma
