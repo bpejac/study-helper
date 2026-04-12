@@ -20,7 +20,7 @@ export default async function Home() {
   return (
     <div>
       {/* Hero Section */}
-      <section className="py-16 sm:py-24 border-b border-[var(--border)]">
+      <section className="hero-rainbow-section py-16 sm:py-24 border-b border-[var(--border)]">
         <div className="max-w-4xl mx-auto px-6">
           <div className="text-center">
             <h1 className="text-3xl sm:text-5xl font-serif font-bold text-[var(--ink)] mb-6 leading-tight">
