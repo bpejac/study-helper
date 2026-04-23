@@ -3,7 +3,7 @@
 A personal study helper web application to document and review what I've learned throughout my software development career. Now with **admin editing features** for managing content through a web interface!
 
 ![Next.js](https://img.shields.io/badge/Next.js-16-black)
-![TypeScript](https://img.shields.io/badge/TypeScript-5-blue)
+![TypeScript](https://img.shields.io/badge/TypeScript-6-blue)
 ![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-38bdf8)
 
 ## Features
@@ -12,7 +12,7 @@ A personal study helper web application to document and review what I've learned
 - **Topic Pages** - Detailed pages with key points and code examples
 - **Search** - Quickly find topics across your entire knowledge base
 - **Quiz Mode** - Test yourself with flashcard-style questions
-- **Admin Panel** - Full CRUD interface for managing subjects, topics, and content
+- **Admin Editing** - Inline CRUD interface on public pages; no separate admin panel
 - **Database Storage** - Content stored in SQLite with Prisma ORM
 - **Authentication** - Secure admin login with NextAuth.js
 
@@ -38,8 +38,7 @@ npm install
 
 3. Set up the database
 ```bash
-# Create .env file with your configuration
-cp .env.example .env
+# Create .env file with your configuration (see Environment Variables section)
 
 # Run database migrations
 npx prisma migrate dev
@@ -50,7 +49,7 @@ npx prisma migrate dev
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser.
+Open [http://localhost:4000](http://localhost:4000) with your browser.
 
 ### Default Admin Credentials
 
@@ -59,7 +58,7 @@ Run database migrations to create the admin user:
 - **Username:** `admin`
 - **Password:** `admin`
 
-You can then log in to the admin panel at `/admin/login`
+You can then log in at `/login`
 
 ⚠️ **Important:** Change these credentials in production!
 
@@ -72,53 +71,33 @@ Create a `.env` file in the root directory:
 DATABASE_URL="file:./dev.db"
 
 # NextAuth
-NEXTAUTH_SECRET="change-this-to-a-random-secret-in-production"
-NEXTAUTH_URL="http://localhost:3000"
+AUTH_SECRET="change-this-to-a-random-secret-in-production"
 ```
 
 ## Managing Content
 
-You can add, edit, and delete categories and topics through the admin panel:
-
-1. Log in at `/admin/login` with your admin credentials
-2. Navigate to `/admin/categories` or `/admin/topics`
-3. Use the web interface to manage your content
+There is no separate admin panel. Once logged in at `/login`, inline edit and delete buttons appear directly on all public pages. Use these to add, edit, and delete categories, topics, key points, code examples, and quiz questions.
 
 ## Project Structure
 
 ```
 src/
 ├── app/                  # Next.js App Router pages
-│   ├── admin/           # Admin panel pages
-│   │   ├── subjects/    # Subject management (routes via /categories)
-│   │   ├── topics/      # Topic management
-│   │   └── login/       # Admin login
 │   ├── api/             # API routes
-│   │   ├── auth/        # NextAuth endpoints
-│   │   ├── categories/  # Subject CRUD
-│   │   └── topics/      # Topic CRUD
-│   ├── categories/      # Public subject pages
-=======
-│   │   ├── page.tsx     # Admin dashboard
-│   │   ├── layout.tsx   # Admin layout
-│   │   ├── login/       # Admin login page
-│   │   ├── change-password/  # Change password page
-│   │   ├── categories/  # Category management
-│   │   │   ├── page.tsx
-│   │   │   ├── new/
-│   │   │   └── [id]/
-│   │   └── topics/      # Topic management
-│   │       ├── page.tsx
-│   │       ├── new/
-│   │       └── [id]/
-│   ├── api/             # API routes
-│   │   ├── admin/change-password/  # Change password endpoint
-│   │   ├── auth/[...nextauth]/     # NextAuth endpoints
-│   │   ├── categories/             # Category CRUD
-│   │   └── topics/                 # Topic CRUD
+│   │   ├── auth/[...nextauth]/  # NextAuth endpoints
+│   │   ├── categories/          # Category CRUD
+│   │   ├── categories/[id]/     # Single category CRUD
+│   │   ├── topics/              # Topic CRUD
+│   │   ├── topics/[id]/         # Single topic CRUD
+│   │   ├── topics/[id]/key-points/
+│   │   ├── topics/[id]/code-examples/
+│   │   ├── topics/[id]/quiz-questions/
+│   │   └── search/
 │   ├── categories/      # Public category pages
 │   ├── topics/          # Public topic pages
 │   ├── favorites/       # Favorites page
+│   ├── login/           # Admin login
+│   ├── overview/        # Overview page
 │   ├── quiz/            # Quiz mode
 │   ├── quiz-questions/  # Quiz questions page
 │   ├── search/          # Search page
@@ -126,12 +105,12 @@ src/
 │   ├── layout.tsx       # Root layout
 │   └── page.tsx         # Homepage
 ├── components/          # Reusable React components
+│   └── editor/         # Inline editing modals
 ├── lib/                 # Utility functions
 │   ├── auth.ts         # NextAuth configuration
 │   ├── data.ts         # Database queries
 │   └── prisma.ts       # Prisma client
-├── types/              # TypeScript definitions
-└── data/               # Static content data
+└── types/              # TypeScript definitions
 
 prisma/
 ├── schema.prisma       # Database schema
