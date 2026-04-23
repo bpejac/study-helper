@@ -126,7 +126,7 @@ export default async function Home() {
           <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
             <span className="font-serif text-[var(--ink)]">Study Helper</span>
             <p className="text-[var(--ink-light)] text-sm">
-              Vibe coded with Next.js &amp; TypeScript
+              Basel ⚡️ {(new Date()).getFullYear()}
             </p>
           </div>
         </div>
