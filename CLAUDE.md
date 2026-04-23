@@ -21,7 +21,7 @@ No test suite is configured.
 
 - **Next.js 16** (App Router) with React 19, TypeScript, Turbopack
 - **Tailwind CSS 4** with PostCSS
-- **Prisma 7** with SQLite (`better-sqlite3` adapter) — DB file at `prisma/dev.db`
+- **Prisma 7** with SQLite (`better-sqlite3` adapter) — DB file at `dev.db` (project root)
 - **NextAuth.js 5 beta** — credentials provider, JWT sessions
 - **react-markdown** + remark-gfm + remark-breaks for markdown rendering
 - **prism-react-renderer** for code syntax highlighting
@@ -32,11 +32,12 @@ No test suite is configured.
 
 ```
 src/app/
-  (public pages)  /categories, /categories/[id], /topics/[id],
+  (public pages)  /categories, /categories/[id], /topics/[id], /topics/new,
                   /search, /quiz, /quiz-questions, /favorites, /overview
   /login          Admin login
-  /api/           REST endpoints (categories, topics, topics/[id]/key-points,
-                  /code-examples, /quiz-questions, /search, /auth/[...nextauth])
+  /api/           REST endpoints (categories, categories/[id], topics, topics/[id],
+                  topics/[id]/key-points, topics/[id]/code-examples,
+                  topics/[id]/quiz-questions, search, auth/[...nextauth])
 ```
 
 ### Data Flow
@@ -69,12 +70,11 @@ There is no separate admin panel. Authenticated users see inline edit/delete but
 
 ### Theming
 
-Light/dark mode is implemented via CSS custom properties in `globals.css`. The React compiler Babel plugin is enabled in `next.config.ts`.
+Light/dark mode is implemented via CSS custom properties in `globals.css`. The React Compiler is enabled via `reactCompiler: true` in `next.config.ts`.
 
 ## Environment Variables
 
 ```
 DATABASE_URL="file:./dev.db"
 AUTH_SECRET="..."
-NEXTAUTH_URL="http://localhost:3000"
 ```
