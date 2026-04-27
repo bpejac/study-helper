@@ -1,6 +1,7 @@
 import ReactMarkdown from 'react-markdown';
 import remarkBreaks from 'remark-breaks';
 import remarkGfm from 'remark-gfm';
+import MermaidDiagram from './MermaidDiagram';
 
 interface MarkdownProps {
   children: string;
@@ -21,11 +22,24 @@ export default function Markdown({ children, className = '' }: MarkdownProps) {
               {children}
             </code>
           ),
-          pre: ({ children }) => (
-            <pre className="bg-[var(--code-bg)] text-[var(--ink)] p-4 overflow-x-auto max-w-full font-mono text-sm border border-[var(--border)] my-2 [&>code]:bg-transparent [&>code]:border-0 [&>code]:p-0 [&>code]:whitespace-pre [&>code]:block">
-              {children}
-            </pre>
-          ),
+          pre: ({ node, children }) => {
+            const codeEl = (node as any)?.children?.[0];
+            if (codeEl?.type === 'element' && codeEl.tagName === 'code') {
+              const classes: string[] = codeEl.properties?.className || [];
+              if (classes.includes('language-mermaid')) {
+                const text = (codeEl.children as any[])
+                  ?.filter((c: any) => c.type === 'text')
+                  .map((c: any) => c.value as string)
+                  .join('') || '';
+                return <MermaidDiagram>{text}</MermaidDiagram>;
+              }
+            }
+            return (
+              <pre className="bg-[var(--code-bg)] text-[var(--ink)] p-4 overflow-x-auto max-w-full font-mono text-sm border border-[var(--border)] my-2 [&>code]:bg-transparent [&>code]:border-0 [&>code]:p-0 [&>code]:whitespace-pre [&>code]:block">
+                {children}
+              </pre>
+            );
+          },
           a: ({ href, children }) => (
             <a href={href} className="text-[var(--accent)] hover:underline" target="_blank" rel="noopener noreferrer">
               {children}
