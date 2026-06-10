@@ -288,7 +288,7 @@ git clone https://github.com/brunottonurb/study-helper.git
 cd study-helper
 
 # 2. Start the application
-docker-compose up -d
+docker compose up -d
 ```
 
 The application will be available at `http://localhost:3000`.
@@ -303,7 +303,7 @@ echo 'AUTH_TRUST_HOST="true"' >> .env
 
 2. Start the application:
 ```bash
-docker-compose up -d
+docker compose up -d
 ```
 
 3. (Optional) For a custom domain, set:
@@ -340,14 +340,14 @@ Backups are disabled by default. Enable the `backup` profile when needed.
 
 ```bash
 # Start app without backup (default)
-docker-compose up -d
+docker compose up -d
 
 # Enable backup service
-docker-compose --profile backup up -d backup
+docker compose --profile backup up -d backup
 
 # Stop backup service
-docker-compose stop backup
-docker-compose rm -f backup
+docker compose stop backup
+docker compose rm -f backup
 ```
 
 Backups are stored in `./backups/` with format `prisma-YYYYMMDD-HHMMSS.db`.
@@ -356,28 +356,28 @@ Backups are stored in `./backups/` with format `prisma-YYYYMMDD-HHMMSS.db`.
 
 ```bash
 # View logs
-docker-compose logs -f study-helper
+docker compose logs -f study-helper
 
 # Stop the application
-docker-compose down
+docker compose down
 
 # Stop and remove app plus database volume (WARNING: deletes data)
-docker-compose down -v
+docker compose down -v
 
 # Rebuild the image
-docker-compose build --no-cache
+docker compose build --no-cache
 
 # Run database migrations in container
-docker-compose exec study-helper npx prisma migrate deploy
+docker compose exec study-helper npx prisma migrate deploy
 
 # Open Prisma Studio in container
-docker-compose exec study-helper npx prisma studio
+docker compose exec study-helper npx prisma studio
 
 # Execute custom commands
-docker-compose exec study-helper npm run lint
+docker compose exec study-helper npm run lint
 
 # Copy local dev.db into Docker volume (container must be running)
-docker-compose cp dev.db study-helper:/app/data/prisma.db
+docker compose cp dev.db study-helper:/app/data/prisma.db
 
 # Alternative: copy to volume without running container
 docker run --rm -v study-helper-db:/app/data -v $(pwd):/host alpine cp /host/dev.db /app/data/prisma.db
